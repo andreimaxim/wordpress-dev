@@ -62,7 +62,7 @@ WORKDIR ${APP_DIR}
 
 # Copy the files but this shouldn't matter as we'll probably always mount
 # a volume at this location.
-COPY --chown=deploy:deploy . ./
+COPY . ./
 
 # Ensure correct permissions.
 RUN chown -R deploy:deploy ${APP_DIR}
