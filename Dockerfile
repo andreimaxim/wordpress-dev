@@ -55,8 +55,7 @@ RUN sed -i -e"s@TEMPLATE@${WP_DOMAIN}@g" \
   /etc/nginx/sites-enabled/wordpress.conf
 
 
-RUN mkdir -p ${APP_DIR} \
-    && chown -R deploy:deploy ${APP_DIR}
+RUN mkdir -p ${APP_DIR}
 
 # Move the the application folder to perform all the following tasks.
 WORKDIR ${APP_DIR}
@@ -64,5 +63,8 @@ WORKDIR ${APP_DIR}
 # Copy the files but this shouldn't matter as we'll probably always mount
 # a volume at this location.
 COPY --chown=deploy:deploy . ./
+
+# Ensure correct permissions.
+RUN chown -R deploy:deploy ${APP_DIR}
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
