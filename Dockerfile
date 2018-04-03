@@ -10,9 +10,7 @@ FROM ubuntu:16.04
 RUN groupadd -r deploy \
     && useradd -m -r -g deploy deploy
 
-ENV DEBIAN_FRONTEND noninteractive
-
-RUN set -eux  \
+RUN DEBIAN_FRONTEND=noninteractive set -eux  \
   && apt-get update \
   && apt-get install --no-install-recommends --no-install-suggests -y \
     php \
@@ -42,25 +40,7 @@ COPY config/nginx/nginx.conf /etc/nginx/
 COPY config/nginx/sites-available/wordpress.conf \ 
   /etc/nginx/sites-available/
 
-ARG WP_DOMAIN="example.com"
-ENV APP_DIR="/srv/www/${WP_DOMAIN}"
-
-# The replacement values contains some slashes which will normally
-# break the sed format so using @ instead.
-RUN sed -i -e"s@TEMPLATE@${WP_DOMAIN}@g" \
-    /etc/nginx/sites-available/wordpress.conf \
-  && sed -i -e"s@FOLDER@${APP_DIR}@g" \
-    /etc/nginx/sites-available/wordpress.conf \
-  && ln -s /etc/nginx/sites-available/wordpress.conf \
+RUN ln -s /etc/nginx/sites-available/wordpress.conf \
   /etc/nginx/sites-enabled/wordpress.conf
-
-
-RUN mkdir -p ${APP_DIR}
-
-# Move the the application folder to perform all the following tasks.
-WORKDIR ${APP_DIR}
-
-# Ensure correct permissions.
-RUN chown -R deploy:deploy ${APP_DIR}
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]

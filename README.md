@@ -13,6 +13,29 @@ that starts with this line:
 FROM andreimaxim/wordpress-dev
 ```
 
+Most likely, you will also need to add these lines in your Dockerfile
+to have everything arranged nicely:
+
+```bash
+ARG WP_DOMAIN="example.com"
+ENV APP_DIR="/srv/www/${WP_DOMAIN}"
+
+# The replacement values contains some slashes which will normally
+# break the sed format so using @ instead.
+RUN sed -i -e"s@TEMPLATE@${WP_DOMAIN}@g" \
+    /etc/nginx/sites-available/wordpress.conf \
+  && sed -i -e"s@FOLDER@${APP_DIR}@g" \
+    /etc/nginx/sites-available/wordpress.conf
+
+RUN mkdir -p ${APP_DIR}
+
+# Move the the application folder to perform all the following tasks.
+WORKDIR ${APP_DIR}
+
+# Ensure correct permissions.
+RUN chown -R deploy:deploy ${APP_DIR}
+```
+
 This will automatically perform the setup for an environment based on Ubuntu 16.04 
 (the latest LTS version) that contains the following packages:
 
@@ -30,7 +53,6 @@ to manage this container and a MySQL container. This also allows you to specify
 a domain name so the app is stored in the right folder (bonus points: you can
 mirror this structure on your server and have multiple Wordpress instances on
 the same server).
-
 
 ### SSL
 
