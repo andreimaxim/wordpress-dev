@@ -60,10 +60,6 @@ RUN mkdir -p ${APP_DIR}
 # Move the the application folder to perform all the following tasks.
 WORKDIR ${APP_DIR}
 
-# Copy the files but this shouldn't matter as we'll probably always mount
-# a volume at this location.
-COPY . ./
-
 # Ensure correct permissions.
 RUN chown -R deploy:deploy ${APP_DIR}
 
